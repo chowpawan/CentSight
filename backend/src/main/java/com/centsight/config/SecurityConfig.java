@@ -2,6 +2,7 @@ package com.centsight.config;
 
 import com.centsight.security.CurrentUserArgumentResolver;
 import com.centsight.security.JwtAuthFilter;
+import com.centsight.security.OAuth2FailureHandler;
 import com.centsight.security.OAuth2SuccessHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,13 +28,16 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtFilter;
     private final OAuth2SuccessHandler successHandler;
+    private final OAuth2FailureHandler failureHandler;
     private final List<String> allowedOrigins;
 
     public SecurityConfig(JwtAuthFilter jwtFilter,
                           OAuth2SuccessHandler successHandler,
+                          OAuth2FailureHandler failureHandler,
                           @Value("${centsight.cors.allowed-origins:}") String origins) {
         this.jwtFilter = jwtFilter;
         this.successHandler = successHandler;
+        this.failureHandler = failureHandler;
         this.allowedOrigins = origins.isBlank() ? List.of() : List.of(origins.split("\\s*,\\s*"));
     }
 
@@ -48,7 +52,7 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/health", "/api/webhook", "/oauth2/**", "/login/**").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll())
-            .oauth2Login(o -> o.successHandler(successHandler))
+            .oauth2Login(o -> o.successHandler(successHandler).failureHandler(failureHandler))
             // Unauthenticated API calls get a 401, never a redirect to Google's login page.
             .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
