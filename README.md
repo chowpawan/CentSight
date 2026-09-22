@@ -1,4 +1,10 @@
-# Pocketbook
+# CentSight
+
+![Node](https://img.shields.io/badge/node-%3E%3D22-5FA04E?logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-better--sqlite3-003B57?logo=sqlite&logoColor=white)
+![Plaid](https://img.shields.io/badge/Plaid-API-111111)
 
 A personal finance dashboard built on Plaid. It shows every bank and credit card balance, what you owe versus what you have, spending by category and merchant for each month, and recurring charges.
 
