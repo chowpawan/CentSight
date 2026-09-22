@@ -1,0 +1,75 @@
+spring:
+  application:
+    name: centsight-api
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/centsight}
+    username: ${DATABASE_USER:centsight}
+    password: ${DATABASE_PASSWORD:centsight}
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      # Flyway owns the schema; Hibernate only checks that it matches the entities.
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: always
+    serialization:
+      write-dates-as-timestamps: false
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: openid, email, profile
+
+server:
+  port: ${PORT:8000}
+  forward-headers-strategy: framework   # respect X-Forwarded-* behind an AWS load balancer
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+centsight:
+  # Leave APP_URL empty when the jar serves the SPA too (production): the post-login redirect
+  # then uses the request's own origin. Set it only when the SPA is hosted separately.
+  app-url: ${APP_URL:}
+  # Only needed for a separately hosted SPA. Empty means nothing cross-origin is allowed.
+  cors:
+    allowed-origins: ${CORS_ORIGINS:}
+  jwt:
+    secret: ${JWT_SECRET}
+    ttl-days: 30
+  # 64 hex characters. Losing this means every bank has to be reconnected.
+  encryption-key: ${ENCRYPTION_KEY}
+  # Optional comma-separated guest list. Empty means anyone with a Google account can sign in.
+  allowed-emails: ${ALLOWED_EMAILS:}
+  plaid:
+    client-id: ${PLAID_CLIENT_ID}
+    secret: ${PLAID_SECRET}
+    env: ${PLAID_ENV:sandbox}
+    webhook-url: ${PLAID_WEBHOOK_URL:}
+
+logging:
+  level:
+    com.centsight: INFO

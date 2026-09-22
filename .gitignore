@@ -5,3 +5,14 @@ dist/
 *.db-*
 .DS_Store
 .idea/
+
+# Java
+target/
+*.jar
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+.terraform.lock.hcl

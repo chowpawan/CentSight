@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/target
+.git
+.idea
+*.db
+*.db-*
+.env
+**/.env
+infra/.terraform

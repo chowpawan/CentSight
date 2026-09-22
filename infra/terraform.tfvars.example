@@ -1,0 +1,13 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+region     = "us-west-2"
+plaid_env  = "sandbox"
+
+plaid_client_id = "your_plaid_client_id"
+plaid_secret    = "your_plaid_sandbox_secret"
+
+# From Google Cloud Console -> APIs & Services -> Credentials -> OAuth client ID (Web application)
+google_client_id     = "xxxxxxxx.apps.googleusercontent.com"
+google_client_secret = "your_google_client_secret"
+
+# Optional: restrict sign-in to your friends' Google addresses.
+# allowed_emails = "you@gmail.com,friend@gmail.com"

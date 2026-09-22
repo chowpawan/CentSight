@@ -4,7 +4,7 @@ export default function Spending({ months, month, setMonth, data }) {
   const idx = months.indexOf(month);
   const older = months[idx + 1];
   const newer = months[idx - 1];
-  const max = data?.byCategory[0]?.total || 1;
+  const max = data?.by_category[0]?.total || 1;
   const trendMax = Math.max(...(data?.trend || []).map((t) => t.total), 1);
 
   return (
@@ -41,7 +41,7 @@ export default function Spending({ months, month, setMonth, data }) {
 
           <h3>By category</h3>
           <ul className="cat-list">
-            {data.byCategory.map((c) => (
+            {data.by_category.map((c) => (
               <li key={c.category} className="cat">
                 <div className="cat-row">
                   <span>{categoryLabel(c.category)}</span>
@@ -54,7 +54,7 @@ export default function Spending({ months, month, setMonth, data }) {
 
           <h3>Where it went</h3>
           <ol className="merchants">
-            {data.topMerchants.map((m) => (
+            {data.top_merchants.map((m) => (
               <li key={m.merchant}>
                 {m.logo_url ? <img src={m.logo_url} alt="" className="logo" /> : <span className="logo logo-blank">{m.merchant?.[0]}</span>}
                 <span className="merchant-name">{m.merchant}</span>
