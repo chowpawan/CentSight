@@ -3,9 +3,11 @@ package com.centsight.security;
 import com.centsight.domain.User;
 import com.centsight.repo.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -71,6 +73,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         users.save(user);
 
         String token = jwt.issue(user.getId(), user.getEmail());
+
+        // The bearer token is the session from here on. Drop the OAuth login session so later API
+        // calls authenticate from the JWT and not from a cookie holding an OAuth2User principal.
+        HttpSession session = req.getSession(false);
+        if (session != null) session.invalidate();
+        SecurityContextHolder.clearContext();
+
         res.sendRedirect(baseUrl(req) + "/#token=" + URLEncoder.encode(token, StandardCharsets.UTF_8));
     }
 

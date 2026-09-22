@@ -26,6 +26,8 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         if (auth != null && auth.getPrincipal() instanceof User user) {
             return user;
         }
-        throw new IllegalStateException("No authenticated user on the request");
+        // Reached when a request is authenticated by something other than our JWT (e.g. a stale
+        // OAuth session cookie). Treat it as unauthenticated so the client signs in again.
+        throw new UnauthorizedException("No CentSight session on this request");
     }
 }

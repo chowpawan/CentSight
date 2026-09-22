@@ -1,6 +1,7 @@
 package com.centsight.web;
 
 import com.centsight.dto.Dtos.ApiError;
+import com.centsight.security.UnauthorizedException;
 import com.centsight.service.PlaidException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,11 @@ public class ApiExceptionHandler {
         HttpStatus status = HttpStatus.resolve(e.getHttpStatus()) == null
                 ? HttpStatus.BAD_GATEWAY : HttpStatus.valueOf(e.getHttpStatus());
         return ResponseEntity.status(status).body(new ApiError(e.getErrorCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiError> unauthorized(UnauthorizedException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiError("UNAUTHORIZED", e.getMessage()));
     }
 
     @ExceptionHandler(BadRequestException.class)

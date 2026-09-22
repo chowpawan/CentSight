@@ -31,9 +31,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String header = req.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")
-                && SecurityContextHolder.getContext().getAuthentication() == null) {
-
+        if (header != null && header.startsWith("Bearer ")) {
+            // Deliberately overrides any existing authentication: a request carrying a bearer token
+            // is a token request, even if a stale OAuth session cookie is also present.
             jwt.verify(header.substring(7))
                .flatMap(users::findById)
                .ifPresent(this::authenticate);
