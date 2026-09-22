@@ -11,6 +11,7 @@ import com.centsight.repo.TxnRepository;
 import com.plaid.client.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,13 @@ public class SyncService {
     private static final Set<String> SOFT_ERRORS = Set.of(
             "PRODUCTS_NOT_SUPPORTED", "PRODUCT_NOT_READY", "NO_LIABILITY_ACCOUNTS", "ADDITIONAL_CONSENT_REQUIRED");
 
+    /**
+     * Self-reference used to call syncItem through the Spring proxy. Calling this.syncItem()
+     * directly would bypass it, so @Transactional would not apply and the per-item writes would
+     * run without a transaction.
+     */
+    private final ObjectProvider<SyncService> self;
+
     private final PlaidService plaid;
     private final CryptoService crypto;
     private final PlaidItemRepository items;
@@ -43,8 +51,10 @@ public class SyncService {
     private final TxnRepository txns;
     private final RecurringStreamRepository recurring;
 
-    public SyncService(PlaidService plaid, CryptoService crypto, PlaidItemRepository items,
-                       AccountRepository accounts, TxnRepository txns, RecurringStreamRepository recurring) {
+    public SyncService(ObjectProvider<SyncService> self, PlaidService plaid, CryptoService crypto,
+                       PlaidItemRepository items, AccountRepository accounts, TxnRepository txns,
+                       RecurringStreamRepository recurring) {
+        this.self = self;
         this.plaid = plaid;
         this.crypto = crypto;
         this.items = items;
@@ -77,7 +87,7 @@ public class SyncService {
         List<SyncResult> results = new ArrayList<>();
         for (PlaidItem item : items.findByUserIdOrderByCreatedAtAsc(userId)) {
             try {
-                results.add(syncItem(item));
+                results.add(self.getObject().syncItem(item));
             } catch (PlaidException e) {
                 log.error("sync failed for item {}: {}", item.getItemId(), e.getErrorCode());
                 results.add(new SyncResult(item.getItemId(), item.getInstitutionName(), 0, 0, 0, e.getErrorCode()));
